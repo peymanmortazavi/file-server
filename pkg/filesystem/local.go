@@ -61,6 +61,9 @@ func (d DirManager) Get(path string) (Item, error) {
 		item.Children = make([]Item, 0, len(files))
 		for _, file := range files {
 			child := Item{FileMode: file.Mode(), Name: file.Name(), Size: file.Size(), Owner: ownerName(file)}
+			if file.Mode().IsRegular() {
+				child.Opener = fileOpener{filepath.Join(absolutePath, file.Name())}
+			}
 			item.Children = append(item.Children, child)
 		}
 	} else {
