@@ -32,7 +32,7 @@ func ownerName(info os.FileInfo) string {
 	if stat, ok := info.Sys().(*syscall.Stat_t); ok {
 		uid := stat.Uid
 		userID := strconv.FormatUint(uint64(uid), 10)
-		if user, err := user.LookupId(userID); err != nil {
+		if user, err := user.LookupId(userID); err == nil {
 			return user.Username
 		}
 	}
