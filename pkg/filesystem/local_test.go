@@ -48,15 +48,17 @@ func TestView(t *testing.T) {
 	root := setupTestDir(t)
 	manager := filesystem.DirManager{root}
 
-	item, err := manager.Get("/")
-	if err != nil {
-		t.Errorf("getting the root module failed: %s", err)
-	}
-	if !item.FileMode.IsDir() {
-		t.Errorf("root module file mode is not dir")
-	}
-	if len(item.Children) != 0 {
-		t.Errorf("expected no files in the root module but view returned: %d", len(item.Children))
+	for _, path := range []string{"", "/"} {
+		item, err := manager.Get(path)
+		if err != nil {
+			t.Errorf("getting the root module failed: %s", err)
+		}
+		if !item.FileMode.IsDir() {
+			t.Errorf("root module file mode is not dir")
+		}
+		if len(item.Children) != 0 {
+			t.Errorf("expected no files in the root module but view returned: %d", len(item.Children))
+		}
 	}
 
 	type expectation struct {
