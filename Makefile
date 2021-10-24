@@ -1,3 +1,11 @@
+IMAGE_REPO := peymanmo
+SERVER_IMAGE_NAME := fs-server
+CLIENT_IMAGE_NAME := fsc
+QUERY := 
+
+FS_IMAGE := ${IMAGE_REPO}/${SERVER_IMAGE_NAME}
+FC_IMAGE := ${IMAGE_REPO}/${CLIENT_IMAGE_NAME}
+
 TARGETS = fs-server fsc
 
 $(TARGETS):
@@ -7,13 +15,13 @@ clean:
 	rm -fr bin
 
 build-server-image:
-	docker build -t fs-server -f docker/fs-server/Dockerfile .
+	docker build -t ${FS_IMAGE} -f docker/fs-server/Dockerfile .
 
 run-server-image: build-server-image
-	docker run -v $$(pwd)/test:/test:rw -p 6000:6000 fs-server /opt/fileserver/fs-server --root /test
+	docker run -v $$(pwd)/test:/test:rw -p 6000:6000 ${FS_IMAGE} /opt/fileserver/fs-server --root /test
 
 build-client-image:
-	docker build -t fsc -f docker/fsc/Dockerfile .
+	docker build -t ${FC_IMAGE} -f docker/fsc/Dockerfile .
 
 run-client-image: build-client-image
-	docker run --network host fsc /opt/fileserver/fsc --insecure
+	docker run --network host ${FC_IMAGE} /opt/fileserver/fsc --insecure ${QUERY}
