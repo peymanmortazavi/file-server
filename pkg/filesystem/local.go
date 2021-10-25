@@ -10,6 +10,10 @@ import (
 	"syscall"
 )
 
+const (
+	defaultFlag = 0644
+)
+
 // DirManager is capable of managing a local directory.
 // Vieweing and editing its content.
 type DirManager struct {
@@ -20,8 +24,8 @@ type fileOpener struct {
 	path string
 }
 
-func (f fileOpener) Open() (io.ReadCloser, error) {
-	file, err := os.Open(f.path)
+func (f fileOpener) Open(flag int) (io.ReadWriteCloser, error) {
+	file, err := os.OpenFile(f.path, flag, defaultFlag)
 	if err != nil {
 		return nil, err
 	}
@@ -70,4 +74,36 @@ func (d DirManager) Get(path string) (Item, error) {
 		item.Opener = fileOpener{absolutePath}
 	}
 	return item, nil
+}
+
+// CreateFile creates a local file.
+func (d DirManager) CreateFile(path string) (Item, error) {
+	absolutePath := filepath.Join(d.Root, path)
+	if _, err := os.Stat(absolutePath); err != nil {
+		if os.IsNotExist(err) {
+			if file, err := os.Create(absolutePath); err != nil {
+				return Item{}, err
+			} else {
+				_ = file.Close()
+				return d.Get(path)
+			}
+		}
+		return Item{}, err
+	}
+	return Item{}, FileAlreadyExists
+}
+
+// CreateDir creates a local directory.
+func (d DirManager) CreateDir(path string) (Item, error) {
+	absolutePath := filepath.Join(d.Root, path)
+	if err := os.MkdirAll(absolutePath, 0644); err != nil {
+		return Item{}, err
+	}
+	return d.Get(path)
+}
+
+// Delete removes the file or directory completely.
+func (d DirManager) Delete(path string) error {
+	absolutePath := filepath.Join(d.Root, path)
+	return os.RemoveAll(absolutePath)
 }

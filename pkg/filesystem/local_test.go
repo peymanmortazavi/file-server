@@ -120,7 +120,7 @@ func TestView(t *testing.T) {
 			}
 			// if data is provided, check data.
 			if len(testCase.data) > 0 {
-				reader, err := result.Open()
+				reader, err := result.Open(os.O_RDONLY)
 				if err != nil {
 					t.Errorf("could not open file %s: %s", testCase.path, err)
 				}

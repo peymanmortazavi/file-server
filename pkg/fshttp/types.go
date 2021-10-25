@@ -31,6 +31,17 @@ type FileItem struct {
 	Children   []FileItem  `json:"children,omitempty"`
 }
 
+// FileWriteRequest describes a file write request.
+type FileWriteRequest struct {
+	Data string `json:"data,omitempty"`
+}
+
+// CreateFileItemRequest represents a request to create a new file item.
+type CreateFileItemRequest struct {
+	FileWriteRequest `json:",inline"`
+	Type             FileType `json:"type"`
+}
+
 // fileItemFromFSItem converts filesystem.Item to FileItem.
 //
 // This method only fails when populating data.
@@ -59,7 +70,7 @@ func fileItemFromFSItem(item filesystem.Item, populateData bool) (FileItem, erro
 		result.Type = RegularFile
 		if populateData && item.Opener != nil {
 			builder := &strings.Builder{}
-			file, err := item.Open()
+			file, err := item.Open(os.O_RDONLY)
 			if err != nil {
 				return result, fmt.Errorf("failed to read %s: %s", item.Name, err)
 			}
