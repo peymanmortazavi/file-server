@@ -16,7 +16,7 @@ func main() {
 	flag.Parse()
 
 	manager := filesystem.DirManager{Root: *rootDir}
-	handler := &fshttp.Handler{Viewer: manager}
+	handler := &fshttp.Handler{Editor: manager}
 	http.Handle("/", handler)
 
 	log.Fatalln(http.ListenAndServe(*addr, nil))
