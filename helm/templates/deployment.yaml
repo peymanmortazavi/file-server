@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fs-server-{{ .Release.Name }}
+  labels:
+    release: {{ .Release.Name }}
+    component: fs-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
+      component: fs-server
+  template:
+    metadata:
+      labels:
+        release: {{ .Release.Name }}
+        component: fs-server
+    spec:
+      {{- if .Values.server.serviceAccountName }}
+      serviceAccountName: {{ .Values.server.serviceAccountName }}
+      {{- end }}
+      {{- if .Values.secrets.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.secrets.imagePullSecret }}
+      {{- end }}
+      containers:
+        - name: server
+          image: {{ .Values.server.image }}
+          ports:
+            - containerPort: 6000
+          command:
+            - /opt/fileserver/fs-server
+            - "--root"
+            - {{ .Values.server.root }}
+          {{- if .Values.server.resources }}
+          resources:
+{{ toYaml .Values.server.resources | indent 14 }}
+          {{- end }}
+          {{- if .Values.server.volumeMounts }}
+          volumeMounts:
+{{ toYaml .Values.server.volumeMounts | indent 14 }}
+          {{- end }}
+        {{- if .Values.server.volumes }}
+        volumes:
+{{ toYaml .Values.server.volumes | indent 12 }}
+        {{- end }}
+
+

@@ -1,0 +1,20 @@
+secrets:
+  imagePullSecret:
+
+server:
+  serviceAccountName:
+  image: peymanmo/fs-server
+  root: /opt
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  service:
+    type: ClusterIP
+    port: 80
+    portName: http
+  volumeMounts:
+  volumes:

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fs-server-{{ .Release.Name }}
+  labels:
+    release: {{ .Release.Name }}
+    component: fs-server
+spec:
+  selector:
+    release: {{ .Release.Name }}
+    component: fs-server
+  {{- if .Values.server.service.type }}
+  type: {{ .Values.server.service.type }}
+  {{- end }}
+  ports:
+    - targetPort: 6000
+      port: {{ .Values.server.service.port }}
+      name: {{ .Values.server.service.portName }}
