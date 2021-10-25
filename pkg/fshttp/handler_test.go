@@ -1,6 +1,8 @@
 package fshttp_test
 
 import (
+	"bytes"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -46,18 +48,30 @@ func (d *dummyViewer) Get(path string) (filesystem.Item, error) {
 	return *cursor, nil
 }
 
+func (*dummyViewer) CreateDir(string) (filesystem.Item, error) {
+	return filesystem.Item{}, errors.New("not implemented")
+}
+
+func (*dummyViewer) CreateFile(string) (filesystem.Item, error) {
+	return filesystem.Item{}, errors.New("not implemented")
+}
+
+func (*dummyViewer) Delete(string) error {
+	return errors.New("not implemented")
+}
+
 type stringOpener string
 
 type fakeFile struct {
-	*strings.Reader
+	*bytes.Buffer
 }
 
 func (f fakeFile) Close() error {
 	return nil
 }
 
-func (s stringOpener) Open() (io.ReadCloser, error) {
-	return &fakeFile{strings.NewReader(string(s))}, nil
+func (s stringOpener) Open(int) (io.ReadWriteCloser, error) {
+	return &fakeFile{bytes.NewBufferString(string(s))}, nil
 }
 
 func mustMakeGETRequest(url string) *http.Request {

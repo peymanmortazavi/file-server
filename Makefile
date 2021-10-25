@@ -31,3 +31,7 @@ push-server-image:
 
 push-client-image:
 	docker push ${FC_IMAGE}
+
+.PHONY: test
+test:
+	go test ./...
